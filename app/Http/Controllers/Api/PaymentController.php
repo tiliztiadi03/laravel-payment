@@ -21,7 +21,7 @@ class PaymentController extends Controller
     {
         $data['payments'] = Payment::paginate(5);
 
-        return response()->json($data);
+        return response()->json($data, 200);
     }
 
     /**
@@ -38,9 +38,7 @@ class PaymentController extends Controller
             'is_active' => 0
         ]);
 
-        $data['message'] = 'success added';
-
-        return response()->json($data, 201);
+        return response()->json(['message' => 'success'], 201);
     }
 
     /**
@@ -54,12 +52,13 @@ class PaymentController extends Controller
     {
         $payment = Payment::find($id);
 
-        $payment->name = $request->name;
-        $payment->email = $request->email;
-        $payment->save();
-        $data['message'] = 'success updated';
+        if (is_null($payment)) {
+            return response()->json(['message' => 'error'], 404);    
+        }
 
-        return response()->json($data, 200);
+        $payment->update($request->all());
+
+        return response()->json(['message' => 'success'], 200);
     }
 
     /**
@@ -72,11 +71,27 @@ class PaymentController extends Controller
     {
         $payment = Payment::find($id);
 
+        if (is_null($payment)) {
+            return response()->json(['message' => 'error'], 404);    
+        }
+        
         $payment->delete();
-        $data['message'] = 'success deleted';
 
-        return response()->json($data, 200);
+        return response()->json(['message' => 'success'], 200);
     }
 
-   
+    /**
+     * Activate user payment.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */ 
+    public function active($id)
+    {
+        $payment = Payment::findOrFail($id);
+
+        $data['message'] = 'activated success';
+
+        return rseponse()->json($data, 200);
+    }
 }

@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 // Route payments
 Route::resource('payments', 'Api\PaymentController')->except(['create', 'show', 'edit']);
+// Route::get('payments', 'Api\PaymentController@index');
+// Route::post('payments', 'Api\PaymentController@store');
 Route::patch('payments/{id}/active', 'Api\PaymentController@active');
 Route::patch('payments/{id}/deactive', 'Api\PaymentController@deactive');
