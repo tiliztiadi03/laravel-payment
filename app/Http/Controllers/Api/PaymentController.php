@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 // Custom namespace
-use App\Payment;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\PaymentRequest;
+use App\Payment;
 
 class PaymentController extends Controller
 {
@@ -24,22 +25,12 @@ class PaymentController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PaymentRequest $request)
     {
         $data['payment'] = Payment::create([
             'name' => $request->name,
@@ -47,35 +38,9 @@ class PaymentController extends Controller
             'is_active' => 0
         ]);
 
-        try {
-            $status = 201;  
-        } catch (\Exception $e) {
-            $status =  400;         
-        }   
+        $data['message'] = 'success added';
 
-        return response()->json($data, $status);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return response()->json($data, 201);
     }
 
     /**
@@ -85,9 +50,16 @@ class PaymentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PaymentRequest $request, $id)
     {
-        //
+        $payment = Payment::find($id);
+
+        $payment->name = $request->name;
+        $payment->email = $request->email;
+        $payment->save();
+        $data['message'] = 'success updated';
+
+        return response()->json($data, 200);
     }
 
     /**
@@ -98,6 +70,13 @@ class PaymentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $payment = Payment::find($id);
+
+        $payment->delete();
+        $data['message'] = 'success deleted';
+
+        return response()->json($data, 200);
     }
+
+   
 }

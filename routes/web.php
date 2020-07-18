@@ -18,4 +18,6 @@ Route::get('/', function () {
 });
 
 // Route payments
-Route::resource('payments', 'Api\PaymentController');
+Route::resource('payments', 'Api\PaymentController')->except(['create', 'show', 'edit']);
+Route::patch('payments/{id}/active', 'Api\PaymentController@active');
+Route::patch('payments/{id}/deactive', 'Api\PaymentController@deactive');
