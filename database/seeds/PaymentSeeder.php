@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-// Custom namespace
 use Faker\Factory as Faker;
+use App\Payment;
 
 class PaymentSeeder extends Seeder
 {
@@ -13,15 +13,9 @@ class PaymentSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create('id_ID');
-
-        for($i = 0; $i < 10; $i++){
-        	// Insert data
-        	DB::table('payments')->insert([
-        		'name' => $faker->name,
-        		'email' => $faker->email,
-        		'is_active' => 1,
-        	]);
-        }
+        Payment::unguard();
+        Payment::truncate();
+        factory(Payment::class, 10)->create();
+        Payment::reguard();
     }
 }
