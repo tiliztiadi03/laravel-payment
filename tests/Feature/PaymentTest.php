@@ -19,7 +19,11 @@ class PaymentTest extends TestCase
      */
     public function testPayments()
     {
+        // make data dummy
+        Payment::unguard();
+        Payment::truncate();
         $payment = factory(Payment::class, 10)->create();
+        Payment::reguard();
 
         $response = $this->get('payments', $payment->toArray());
 
@@ -27,7 +31,7 @@ class PaymentTest extends TestCase
     }
 
     /**
-     * A basic feature test example.
+     * Test create payments.
      *
      * @return void
      */
@@ -42,11 +46,13 @@ class PaymentTest extends TestCase
         $response->assertStatus(201);
     }
 
+    /**
+     * Test update payments.
+     *
+     * @return void
+     */
     public function testUpdatePayments()
     {
-        // make data dummy
-        factory(Payment::class, 10)->create();
-        
         // find data where id = 1 to updated
         $payment = Payment::find(1);
         $payment->name = 'Updated asdfsd';
@@ -57,7 +63,6 @@ class PaymentTest extends TestCase
             'email' => $this->faker->safeEmail // required validation
         ]);
 
-        
         // Payment should be updated in the database.
         $this->assertDatabaseHas('payments', ['id' => $payment->id]);
         
@@ -65,11 +70,13 @@ class PaymentTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * Test delete payments.
+     *
+     * @return void
+     */
     public function testDeletePayments()
-    {
-        // make data dummy
-        factory(Payment::class, 10)->create();
-        
+    {        
         // find data where id = 1 to deleted
         $payment = Payment::find(1);
         $payment->delete();
@@ -80,6 +87,46 @@ class PaymentTest extends TestCase
         
         // Expected payment deleted from database
         $this->assertDatabaseMissing('payments', ['id' => $payment->id]);
+    }
+
+    /**
+     * Test active payments.
+     *
+     * @return void
+     */
+    public function testActivePayments()
+    {
+        $payment = Payment::find(1);
+        $payment->is_active = 1;
+        $payment->save();
+
+        $response = $this->patch('/payments/'.$payment->id.'/active');
+
+        // Payment is_active should be 1 where id.
+        $this->assertDatabaseHas('payments', ['id' => $payment->id, 'is_active' => 1]);
+
+        // expected response code 200
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test active payments.
+     *
+     * @return void
+     */
+    public function testDeactivePayments()
+    {
+        $payment = Payment::find(2);
+        $payment->is_active = 0;
+        $payment->save();
+
+        $response = $this->patch('/payments/'.$payment->id.'/deactive');
+
+        // Payment is_active should be 0 where id.
+        $this->assertDatabaseHas('payments', ['id' => $payment->id, 'is_active' => 0]);
+
+        // expected response code 200
+        $response->assertStatus(200);
     }
 
 }

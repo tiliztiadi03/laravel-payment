@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-// Custom namespace
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\PaymentRequest;
+use App\Notifications\PaymentStatus;
 use App\Payment;
+use Notification;
 
 class PaymentController extends Controller
 {
@@ -41,6 +43,26 @@ class PaymentController extends Controller
         return response()->json(['message' => 'success'], 201);
     }
 
+    /**
+     *  Show a data of the resource
+     * 
+     *  @param int $id
+     *  @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $payment = Payment::where('id', $id)->get()->toArray();
+
+        if (empty($payment)) {
+            return response()->json(['message' => 'error'], 404);    
+        }
+
+        return response()->json([
+            'message' => 'success',
+            'data' => $payment
+        ], 200);
+    }
+     
     /**
      * Update the specified resource in storage.
      *
@@ -88,10 +110,53 @@ class PaymentController extends Controller
      */ 
     public function active($id)
     {
-        $payment = Payment::findOrFail($id);
+        try {
+            DB::beginTransaction();
 
-        $data['message'] = 'activated success';
+            $payment = Payment::find($id);
+            $payment->is_active = 1;
+            $payment->save();
 
-        return rseponse()->json($data, 200);
+            Notification::route('mail', $payment->email)
+                        ->notify(new PaymentStatus($payment));
+
+            DB::commit();
+            return response()->json(['message' => 'activation success'], 200);
+        } catch (\Exception $e) {
+            logger($e->getMessage()); // record error to log
+
+            DB::rollBack(); // rollback update data
+            return response()->json(['message' => 'activation failed'], 500);
+        }
+
+    }
+
+    /**
+     * Deactive user payment.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */ 
+    public function deactive($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $payment = Payment::find($id);
+            $payment->is_active = 0;
+            $payment->save();
+
+            Notification::route('mail', $payment->email)
+                        ->notify(new PaymentStatus($payment));
+
+            DB::commit();
+            return response()->json(['message' => 'activation success'], 200);
+        } catch (\Exception $e) {
+            logger($e->getMessage()); // record error to log
+
+            DB::rollBack(); // rollback update data
+            return response()->json(['message' => 'activation failed'], 500);
+        }
+
     }
 }
