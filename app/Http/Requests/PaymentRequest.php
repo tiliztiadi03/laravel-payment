@@ -28,7 +28,7 @@ class PaymentRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'email' => 'email|required|unique:payments'
+            'email' => 'email|required'
         ];
     }
 

@@ -108,7 +108,7 @@ class PaymentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */ 
-    public function active($id)
+    public function activate($id)
     {
         try {
             DB::beginTransaction();
@@ -137,7 +137,7 @@ class PaymentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */ 
-    public function deactive($id)
+    public function deactivate($id)
     {
         try {
             DB::beginTransaction();
