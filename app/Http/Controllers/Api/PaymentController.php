@@ -75,12 +75,12 @@ class PaymentController extends Controller
         $payment = Payment::find($id);
 
         if (is_null($payment)) {
-            return response()->json(['message' => 'error'], 404);    
+            return response()->json(['message' => 'error update'], 404);    
         }
 
         $payment->update($request->all());
 
-        return response()->json(['message' => 'success'], 200);
+        return response()->json(['message' => 'success update'], 200);
     }
 
     /**
