@@ -150,12 +150,12 @@ class PaymentController extends Controller
                         ->notify(new PaymentStatus($payment));
 
             DB::commit();
-            return response()->json(['message' => 'activation success'], 200);
+            return response()->json(['message' => 'deactivation payment success'], 200);
         } catch (\Exception $e) {
             logger($e->getMessage()); // record error to log
 
             DB::rollBack(); // rollback update data
-            return response()->json(['message' => 'activation failed'], 500);
+            return response()->json(['message' => 'deactivation payment failed'], 500);
         }
 
     }
