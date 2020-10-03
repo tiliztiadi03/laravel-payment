@@ -21,7 +21,7 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        $data['payments'] = Payment::paginate(5);
+        $data['payments'] = Payment::paginate(10);
 
         return response()->json($data, 200);
     }
